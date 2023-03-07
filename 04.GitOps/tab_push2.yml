@@ -1,0 +1,31 @@
+name: Find Tabs
+description: Scan code for tabs
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  find-tabs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Find changed files
+        id: changed-files
+        run: echo "${{ github.event.before }}..${{ github.sha }}" > pr_range && git diff --name-only $(cat pr_range) > changed_files
+
+      - name: Scan files
+        id: scan-files
+        run: |
+          FILES=$(echo "${{ steps.changed-files.outputs.files }}" | tr '\n' ' ')
+          TABS=$(grep -r -n $'\t' $FILES | wc -l)
+          echo "Total tabs found: $TABS" > tabs.txt
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: tabs
+          path: tabs.txt
