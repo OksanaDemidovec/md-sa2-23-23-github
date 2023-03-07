@@ -1,5 +1,4 @@
 name: Find Tabs
-description: Scan code for tabs
 on:
   push:
     branches:
